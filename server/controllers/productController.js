@@ -3,19 +3,30 @@ const Products = require("../model/productmodel");
 
 const AddProduct = async (req, res) => {
   const adminId = req.id;
-  const { Productname, description, price, ImageUrl, Category, stockQuantity } =
-    req.body;
+  const {
+    Productname,
+    description,
+    price,
+    ImageUrls,
+    Category,
+    stockQuantity,
+  } = req.body;
 
   try {
     if (!adminId) {
       return res.status(400).json({ message: "Admin not found" });
+    }
+    if (!Array.isArray(ImageUrls) || ImageUrls.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Please provide at least one image URL" });
     }
 
     const product = await Products.create({
       Productname,
       description,
       price,
-      ImageUrl,
+      ImageUrls,
       Category,
       stockQuantity,
       adminId,

@@ -14,10 +14,12 @@ app.use(cookieParser());
 const UserRoute = require("./routes/user.route");
 const ProductRoute = require("./routes/product.route");
 const AdminRoute = require("./routes/admin.route");
+const AddtoCartRoute = require("./routes/addtocart.route");
 
 app.use("/user", UserRoute);
 app.use("/admin", AdminRoute);
 app.use("/product", ProductRoute);
+app.use("/cart", AddtoCartRoute);
 mongoose
   .connect(MONGODB_URL)
   .then(() => {
