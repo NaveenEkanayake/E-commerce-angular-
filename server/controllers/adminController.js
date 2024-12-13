@@ -120,12 +120,11 @@ const verifyAdminToken = (req, res, next) => {
 
   try {
     const decodedUser = jwt.verify(actualToken, JWT_SECRET_KEY);
-    req.id = decodedUser.id;
+    req.id = decodedUser.id; // decoded user id
     req.email = decodedUser.email;
     req.fullname = decodedUser.fullname;
     req.userRole = decodedUser.role;
     req.isActive = decodedUser.isActive;
-    console.log("Decoded User", decodedUser);
     next();
   } catch (err) {
     console.error("Token verification error:", err.message);
