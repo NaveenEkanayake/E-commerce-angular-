@@ -3,6 +3,7 @@ const ProductModel = require("../model/productmodel");
 const AddtoCartModel = require("../model/addtocartmodel");
 const UserModel = require("../model/usermodel");
 const Cart = require("../model/addtocartmodel");
+const { addtocartEmail } = require("../Email/addtoCartEmail");
 
 const AddtoCart = async (req, res) => {
   const { productId, quantity } = req.body;
@@ -14,6 +15,7 @@ const AddtoCart = async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
+    // Find the product by ID
     const product = await ProductModel.findById(productId);
 
     if (!product) {
@@ -41,23 +43,74 @@ const AddtoCart = async (req, res) => {
         .json({ message: "Product does not have any images" });
     }
 
-    const cart = await AddtoCartModel.create({
-      userId,
-      products: [
-        {
+    let cart = await AddtoCartModel.findOne({ userId });
+
+    if (cart) {
+      const productIndex = cart.products.findIndex(
+        (item) => item.productId.toString() === productId
+      );
+
+      if (productIndex !== -1) {
+        // Update quantity if product already exists in the cart
+        cart.products[productIndex].quantity += quantity;
+      } else {
+        // Add new product if it doesn't exist
+        cart.products.push({
           productId: product._id,
           quantity,
           imageUrls: firstImageUrl,
-        },
-      ],
-      totalAmount: product.price * quantity,
-    });
+        });
+      }
+
+      // Use Promise.all() to handle async operations inside reduce
+      const totalAmount = await Promise.all(
+        cart.products.map(async (item) => {
+          const prod = await ProductModel.findById(item.productId);
+          return prod.price * item.quantity;
+        })
+      ).then((prices) => prices.reduce((total, price) => total + price, 0));
+
+      cart.totalAmount = totalAmount;
+      await cart.save();
+    } else {
+      // Create new cart if one doesn't exist
+      cart = await AddtoCartModel.create({
+        userId,
+        products: [
+          {
+            productId: product._id,
+            quantity,
+            imageUrls: firstImageUrl,
+          },
+        ],
+        totalAmount: product.price * quantity,
+      });
+    }
+
+    const user = await UserModel.findById(userId);
+
+    if (user && user.email) {
+      const cartItems = await Promise.all(
+        cart.products.map(async (item) => {
+          const product = await ProductModel.findById(item.productId);
+          return {
+            productId: item.productId,
+            productName: product.Productname,
+            quantity: item.quantity,
+            imageUrls: product.ImageUrls,
+          };
+        })
+      );
+
+      await addtocartEmail(user.email, user.fullname, cartItems);
+    }
 
     res.status(201).json({
       message: "Items have been added to cart successfully!",
       addedItems: cart,
     });
   } catch (error) {
+    console.error("Error adding to cart:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -188,8 +241,6 @@ const DeleteFromCart = async (req, res) => {
     if (!cartItem) {
       return res.status(404).json({ message: "Cart Item not found!" });
     }
-
-    // Get the product ID and quantity from the cart item
     const productId = cartItem.products[0].productId;
     const productQuantity = cartItem.products[0].quantity;
     const deletedCart = await Cart.findByIdAndDelete(cleanedId);

@@ -15,11 +15,13 @@ const UserRoute = require("./routes/user.route");
 const ProductRoute = require("./routes/product.route");
 const AdminRoute = require("./routes/admin.route");
 const AddtoCartRoute = require("./routes/addtocart.route");
+const OrderRoute = require("./routes/order.route");
 
 app.use("/user", UserRoute);
 app.use("/admin", AdminRoute);
 app.use("/product", ProductRoute);
 app.use("/cart", AddtoCartRoute);
+app.use("/order", OrderRoute);
 mongoose
   .connect(MONGODB_URL)
   .then(() => {

@@ -120,7 +120,7 @@ const verifyAdminToken = (req, res, next) => {
 
   try {
     const decodedUser = jwt.verify(actualToken, JWT_SECRET_KEY);
-    req.id = decodedUser.id; // decoded user id
+    req.id = decodedUser.id;
     req.email = decodedUser.email;
     req.fullname = decodedUser.fullname;
     req.userRole = decodedUser.role;
