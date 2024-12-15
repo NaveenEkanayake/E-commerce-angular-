@@ -18,7 +18,6 @@
       <li>
         <div
           class="bg-[#BE91D0] rounded-full text-white px-6 py-2 hover:bg-[#9B6BA1] transition duration-300"
-          href="#"
         >
           About Us
         </div>
@@ -26,22 +25,21 @@
       <li>
         <div
           class="bg-[#BE91D0] rounded-full text-white px-6 py-2 hover:bg-[#9B6BA1] transition duration-300"
-          href="#"
         >
           Contact
         </div>
       </li>
-      <li>
+      <li class="flex items-center justify-center gap-2">
         <div
+          *ngIf="!loggedIn"
           class="bg-[#BE91D0] rounded-full text-white px-6 py-2 hover:bg-[#9B6BA1] transition duration-300"
-          href="#"
+          (click)="onLoginClick()"
         >
           Login
         </div>
-      </li>
-      <li>
         <div
-          class="bg-[#BE91D0] rounded-full text-white px-2 py-2 hover:bg-[#9B6BA1] transition duration-300"
+          *ngIf="loggedIn"
+          class="bg-[#BE91D0] rounded-full text-white p-2 hover:bg-[#9B6BA1] transition duration-300"
         >
           <img
             src="/usericon.png"
@@ -50,10 +48,10 @@
           />
         </div>
       </li>
+
       <li>
         <div
           class="bg-[#BE91D0] rounded-full p-3 text-white hover:bg-[#9B6BA1] transition duration-300"
-          href="#"
         >
           <img
             src="/CartIcon.png"

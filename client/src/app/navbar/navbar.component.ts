@@ -1,11 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
-  imports: [],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  styleUrls: ['./navbar.component.css'],
+  standalone: true,
+  imports: [CommonModule]
 })
 export class NavbarComponent {
-  hover: boolean = false;
+  loggedIn = false; 
+  loginForm = false;
+
+  toggleLogin() {
+    this.loggedIn = !this.loggedIn; 
+  }
+
+  toggleLoginForm() {
+    this.loginForm =!this.loginForm;
+  }
+  @Output() loginToggle = new EventEmitter<void>();
+
+  onLoginClick() {
+    this.loginToggle.emit();
+  }
+
 }

@@ -1,1 +1,2 @@
-<app-navbar></app-navbar>
+<app-navbar (loginToggle)="toggleShowLogin()"></app-navbar>
+<app-login-form *ngIf="showLogin"></app-login-form>
